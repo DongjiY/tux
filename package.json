@@ -1,0 +1,19 @@
+{
+  "name": "tux",
+  "version": "1.0.0",
+  "description": "test suite for AI agents",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DongjiY/tux.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DongjiY/tux/issues"
+  },
+  "homepage": "https://github.com/DongjiY/tux#readme"
+}
