@@ -1,0 +1,12 @@
+{
+  "apiKey": "",
+  "assistantId": "asst_RJUkaEd2r1l2gUAkjA2sIGZE",
+  "name": "SmartWitness Support Assistant",
+  "model": "gpt-4-1106-preview",
+  "temperature": 0,
+  "instructions": "Support Assistant System Instructions\n\nYou are a professional technical support assistant...",
+  "tools": [],
+  "metadata": {
+    "role": "support"
+  }
+}
