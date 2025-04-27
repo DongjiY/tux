@@ -18,6 +18,14 @@ export class TestCase {
     this.inputs = this.convertInputs(raw);
   }
 
+  public getOutputs(): Outputs {
+    return this.outputs;
+  }
+
+  public getInputs(): Inputs {
+    return this.inputs;
+  }
+
   private convertOutputs(raw: RawTestCase): Outputs {
     return {
       acceptanceCriteria: raw.outputs.acceptance_criteria.map((ac) => {
