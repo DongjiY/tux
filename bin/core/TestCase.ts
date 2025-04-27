@@ -9,6 +9,14 @@ export class TestCase {
     this.inputs = this.convertInputs(raw);
   }
 
+  public getOutputs(): Outputs {
+    return this.outputs;
+  }
+
+  public getInputs(): Inputs {
+    return this.inputs;
+  }
+
   private convertOutputs(raw: RawTestCase): Outputs {
     return {
       acceptanceCriteria: raw.outputs.acceptance_criteria.map((ac) => {
@@ -30,7 +38,7 @@ export class TestCase {
     };
   }
 
-  public onResponse(text: string) {
+  public onResponse(messages: Array<{ role: string; content: string }>) {
     this.outputs.acceptanceCriteria.forEach((ac, index) => {
       // do your logic here
       if (true) {

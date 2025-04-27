@@ -1,4 +1,5 @@
 import { Assistant } from "./Assistant.js";
+import { Engine } from "./core/Engine.js";
 import { TestCase } from "./core/TestCase.js";
 import { RawTestCase } from "./core/types.js";
 import { jsonToObj } from "./utils.js";
@@ -16,7 +17,7 @@ export async function run(options: { tests: string; assistant: string }) {
   await assistantUnderTest.initialize();
 
   for (const raw of opts) {
-    const testCase = new TestCase(raw);
-    console.log(testCase);
+    const engine = new Engine(new TestCase(raw), assistantUnderTest);
+    await engine.run();
   }
 }
