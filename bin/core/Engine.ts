@@ -61,7 +61,7 @@ export class Engine extends Model {
         role: "assistant",
         content: resp,
       });
-      this.testCase.onResponse(this.messages);
+      await this.testCase.onResponse(this.messages);
     }
     console.log(this.messages);
   }
