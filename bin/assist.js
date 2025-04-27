@@ -1,63 +1,82 @@
-import fs from 'fs';
-import { OpenAI } from 'openai';
-import assistantConfig from '../config/assistant.json' assert { type: 'json' };
+import fs from "fs";
+import { OpenAI } from "openai";
+import { jsonToObj } from "./utils.js";
 
-const openai = new OpenAI({ apiKey: assistantConfig.apiKey });
+export class Assistant {
+  openai;
+  path;
+  options;
+  id;
+  threadId;
 
-function persistAssistantId(id) {
-  assistantConfig.assistantId = id;
-  fs.writeFileSync(
-    new URL('../config/assistant.json', import.meta.url),
-    JSON.stringify(assistantConfig, null, 2)
-  );
-}
-
-async function getOrCreateAssistant() {
-  if (assistantConfig.assistantId) return assistantConfig.assistantId;
-
-  const assistants = await openai.beta.assistants.list();
-  const existing = assistants.data.find((a) => a.name === assistantConfig.name);
-
-  if (existing) {
-    persistAssistantId(existing.id);
-    return existing.id;
+  constructor(path) {
+    this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    this.path = path;
   }
 
-  const assistant = await openai.beta.assistants.create({
-    name: assistantConfig.name,
-    instructions: assistantConfig.instructions,
-    model: assistantConfig.model,
-    temperature: assistantConfig.temperature,
-    tools: assistantConfig.tools || [],
-    metadata: assistantConfig.metadata || {}
-  });
-
-  persistAssistantId(assistant.id);
-  return assistant.id;
-}
-
-export async function runWithAssistant(userMessage) {
-  const assistantId = await getOrCreateAssistant();
-
-  const thread = await openai.beta.threads.create();
-
-  await openai.beta.threads.messages.create(thread.id, {
-    role: 'user',
-    content: userMessage,
-  });
-
-  const run = await openai.beta.threads.runs.create(thread.id, {
-    assistant_id: assistantId,
-    instructions: assistantConfig.instructions,
-  });
-
-  while (true) {
-    const status = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-    if (status.status === 'completed') break;
-    if (status.status === 'failed') throw new Error('Assistant run failed.');
-    await new Promise((res) => setTimeout(res, 1000));
+  async initialize() {
+    this.options = await jsonToObj(this.path);
+    await this.getOrCreateAssistant();
+    const thread = await this.openai.beta.threads.create();
+    this.threadId = thread.id;
   }
 
-  const messages = await openai.beta.threads.messages.list(thread.id);
-  return messages.data[0]?.content[0]?.text?.value || '[No response from assistant]';
+  persistAssistantId(id, path) {
+    this.id = id;
+    this.options.id = this.id;
+    fs.writeFileSync(
+      new URL(path, import.meta.url),
+      JSON.stringify(this.options, null, 2)
+    );
+  }
+
+  async getOrCreateAssistant() {
+    console.log(this.options);
+    if (this.options.assistantId) {
+      const assistants = await this.openai.beta.assistants.list();
+      const existing = assistants.data.find(
+        (a) => a.id === this.options.assistantId
+      );
+
+      this.persistAssistantId(existing.id, this.path);
+    } else {
+      const assistant = await this.openai.beta.assistants.create({
+        name: this.options.name,
+        instructions: this.options.instructions,
+        model: this.options.model,
+        temperature: this.options.temperature,
+        tools: this.options.tools || [],
+        metadata: this.options.metadata || {},
+      });
+
+      this.persistAssistantId(assistant.id, this.path);
+    }
+  }
+
+  async submit(userMessage) {
+    console.log("THISIS THE TEHWKJ", this.threadId);
+    await this.openai.beta.threads.messages.create(this.threadId, {
+      role: "user",
+      content: userMessage,
+    });
+
+    const run = await this.openai.beta.threads.runs.createAndPoll(
+      this.threadId,
+      {
+        assistant_id: this.id,
+        instructions: this.options.instructions,
+      }
+    );
+
+    if (run.status === "completed") {
+      const messages = await this.openai.beta.threads.messages.list(
+        run.thread_id
+      );
+      for (const message of messages.data.reverse()) {
+        console.log(`${message.role} > ${message.content[0].text.value}`);
+      }
+    } else {
+      console.log(run.status);
+    }
+  }
 }
