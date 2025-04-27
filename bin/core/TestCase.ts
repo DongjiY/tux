@@ -1,5 +1,5 @@
 import { Outputs, Inputs, RawTestCase } from "./types";
-import { OpenAI } from "openai"; // Ensure this is the correct library for OpenAI
+import { OpenAI } from "openai";
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("Missing OPENAI_API_KEY environment variable.");
@@ -12,6 +12,7 @@ export class TestCase {
   private inputs: Inputs;
   private history: Array<{ role: string; content: string }> = [];
   private checkedMessages: Map<string, Set<string>> = new Map();
+  private finalResultsPrinted: boolean = false; // ✅ added this line
 
   constructor(raw: RawTestCase) {
     this.outputs = this.convertOutputs(raw);
@@ -34,6 +35,7 @@ export class TestCase {
           criteria: ac.criteria!,
           isRequired: ac.isRequired!,
           isCompleted: false,
+          failureReasoning: "", // ✅ added this
         };
       }),
       maxMessages: raw.outputs.max_messages,
@@ -64,7 +66,6 @@ export class TestCase {
         const response = message.content.trim();
         if (!response) continue;
 
-        // Check if this message has already been evaluated for this acceptance alias
         const alreadyChecked = this.checkedMessages
           .get(response)
           ?.has(ac.alias);
@@ -94,14 +95,8 @@ export class TestCase {
                 parameters: {
                   type: "object",
                   properties: {
-                    satisfied: {
-                      type: "boolean",
-                      description: "Whether criteria is satisfied.",
-                    },
-                    reasoning: {
-                      type: "string",
-                      description: "Explain why it satisfies or not.",
-                    },
+                    satisfied: { type: "boolean", description: "Whether criteria is satisfied." },
+                    reasoning: { type: "string", description: "Explain why it satisfies or not." },
                   },
                   required: ["satisfied", "reasoning"],
                 },
@@ -114,8 +109,7 @@ export class TestCase {
           },
         });
 
-        const toolOutput =
-          completion.choices[0]?.message?.tool_calls?.[0]?.function?.arguments;
+        const toolOutput = completion.choices[0]?.message?.tool_calls?.[0]?.function?.arguments;
         if (!toolOutput) continue;
 
         const parsed = JSON.parse(toolOutput) as {
@@ -123,7 +117,6 @@ export class TestCase {
           reasoning: string;
         };
 
-        // Mark this assistant message as checked for this specific acceptance criterion
         if (!this.checkedMessages.has(response)) {
           this.checkedMessages.set(response, new Set());
         }
@@ -131,10 +124,25 @@ export class TestCase {
 
         if (parsed.satisfied) {
           ac.isCompleted = true;
-          console.log(`[${ac.alias}] Reasoning: ${parsed.reasoning}`);
-          break; // stop checking this AC once it's satisfied
+        } else {
+          ac.failureReasoning = parsed.reasoning; // ✅ Save failure reason
         }
       }
     }
+  }
+
+  public printFinalResults(): void {
+    if (this.finalResultsPrinted) return;
+
+    console.log("\nFinal Acceptance Criteria Results:");
+    for (const ac of this.outputs.acceptanceCriteria) {
+      const status = ac.isCompleted ? "PASSED" : "FAILED";
+      console.log(`- [${status}] ${ac.alias}`);
+      if (!ac.isCompleted && ac.failureReasoning) {
+        console.log(`  Reason: ${ac.failureReasoning}`);
+      }
+    }
+    console.log();
+    this.finalResultsPrinted = true;
   }
 }

@@ -64,6 +64,7 @@ export class Engine extends Model {
       await this.testCase.onResponse(this.messages);
     }
     console.log(this.messages);
+    this.testCase.printFinalResults();
   }
 }
 
