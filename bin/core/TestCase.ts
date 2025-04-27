@@ -52,6 +52,9 @@ export class TestCase {
   public async onResponse(
     messages: Array<{ role: string; content: string }>
   ): Promise<void> {
+    if (this.history.length === 0) {
+      console.log(`Assumed Identity: ${this.inputs.assumedIdentity}`);
+    }
     this.history.push(...messages);
 
     const assistantMessages = this.history.filter(
