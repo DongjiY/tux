@@ -1,16 +1,15 @@
 import fs from "fs";
-import { OpenAI } from "openai";
 import { jsonToObj } from "./utils.js";
+import { Model } from "./core/Model.js";
 
-export class Assistant {
-  private openai: any;
+export class Assistant extends Model {
   private path: string;
   private options: any;
   private id?: string;
   private threadId?: string;
 
   constructor(path: string) {
-    this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    super();
     this.path = path;
   }
 
@@ -31,7 +30,6 @@ export class Assistant {
   }
 
   async getOrCreateAssistant() {
-    console.log(this.options);
     if (this.options.assistantId) {
       const assistants = await this.openai.beta.assistants.list();
       const existing = assistants.data.find(
@@ -54,7 +52,7 @@ export class Assistant {
   }
 
   async submit(userMessage: string) {
-    console.log("THISIS THE TEHWKJ", this.threadId);
+    console.log("starting a run", userMessage);
     await this.openai.beta.threads.messages.create(this.threadId, {
       role: "user",
       content: userMessage,
@@ -72,11 +70,12 @@ export class Assistant {
       const messages = await this.openai.beta.threads.messages.list(
         run.thread_id
       );
-      for (const message of messages.data.reverse()) {
-        console.log(`${message.role} > ${message.content[0].text.value}`);
+      console.log(messages);
+      for (const message of messages.data) {
+        if (message.role === "assistant") return message.content[0].text.value;
       }
     } else {
-      console.log(run.status);
+      return null;
     }
   }
 }

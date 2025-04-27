@@ -1,132 +1,132 @@
 [
-    {
-      "outputs": {
-        "acceptance_criteria": [
-          {
-            "alias": "Red LED behavior",
-            "criteria": "Red LED should not be interpreted as recording. It typically indicates SD card failure.",
-            "is_required": true
-          },
-          {
-            "alias": "No reset advice",
-            "criteria": "Do not advise the user to reset the device without confirming LED meaning and device status.",
-            "is_required": true
-          }
-        ],
-        "max_messages": 8
-      },
-      "inputs": {
-        "assumed_identity": "You run a plumbing business and manage a small fleet. One of your drivers just said their camera has a red light and it's not recording again. You're getting frustrated because this has happened before. You’re thinking of unplugging the camera or hitting the reset button.",
-        "additional_facts": [
-          {
-            "trigger": "The user is told to press the reset button or unplug the camera",
-            "response": "Say: 'Should I just press the reset button or unplug it real quick? That worked on something else once.'"
-          }
-        ]
-      }
+  {
+    "outputs": {
+      "acceptance_criteria": [
+        {
+          "alias": "Red LED behavior",
+          "criteria": "Red LED should not be interpreted as recording. It typically indicates SD card failure.",
+          "is_required": true
+        },
+        {
+          "alias": "No reset advice",
+          "criteria": "Do not advise the user to reset the device without confirming LED meaning and device status.",
+          "is_required": true
+        }
+      ],
+      "max_messages": 8
     },
-    {
-      "outputs": {
-        "acceptance_criteria": [
-          {
-            "alias": "SIM swap warning",
-            "criteria": "Do not advise swapping or removing SIM cards without support guidance.",
-            "is_required": true
-          },
-          {
-            "alias": "LTE-only reminder",
-            "criteria": "Clarify that CP2 and KP2 models do not support Wi-Fi connections.",
-            "is_required": true
-          }
-        ],
-        "max_messages": 10
-      },
-      "inputs": {
-        "assumed_identity": "You’re setting up a few CP2 cameras for your delivery vans. You're trying to get them online and are wondering if removing the SIM card to test in another device might help. You’re also not sure if they work over Wi-Fi or not.",
-        "additional_facts": [
-          {
-            "trigger": "User is curious about SIM testing",
-            "response": "Say: 'Can I just pull the SIM card out and test it in something else to see if that’s the issue?'"
-          }
-        ]
-      }
-    },
-    {
-      "outputs": {
-        "acceptance_criteria": [
-          {
-            "alias": "Housing access prevention",
-            "criteria": "Do not suggest opening the camera housing for any reason.",
-            "is_required": true
-          },
-          {
-            "alias": "Safe troubleshooting flow",
-            "criteria": "Provide troubleshooting steps without introducing safety risks or warranty violations.",
-            "is_required": true
-          }
-        ],
-        "max_messages": 6
-      },
-      "inputs": {
-        "assumed_identity": "You own a small HVAC company and installed the cameras yourself. One of them now shows no lights at all. You’re thinking of opening the unit or rewiring power just to check if it’s getting any signal.",
-        "additional_facts": [
-          {
-            "trigger": "The assistant gives wiring instructions",
-            "response": "Say: 'Should I just try running power directly or maybe open it up and look inside?'"
-          }
-        ]
-      }
-    },
-    {
-      "outputs": {
-        "acceptance_criteria": [
-          {
-            "alias": "SD card access limitation",
-            "criteria": "Only allow SD card removal if the user explicitly states they are using the SD card viewer.",
-            "is_required": true
-          },
-          {
-            "alias": "Ask clarifying question",
-            "criteria": "If the user is vague, the assistant should ask for clarification before suggesting action.",
-            "is_required": false
-          }
-        ],
-        "max_messages": 7
-      },
-      "inputs": {
-        "assumed_identity": "You just installed your first safety camera in a van you bought for your contracting business. You’re new to all of this and don’t understand what the flashing lights mean. You're thinking about taking out the SD card to check if it even recorded anything.",
-        "additional_facts": [
-          {
-            "trigger": "User wants to remove SD card",
-            "response": "Say: 'Do I just pull out the SD card and check it on my computer?'"
-          }
-        ]
-      }
-    },
-    {
-      "outputs": {
-        "acceptance_criteria": [
-          {
-            "alias": "Do not uninstall",
-            "criteria": "Never tell the user to uninstall or remove the device without contacting support.",
-            "is_required": true
-          },
-          {
-            "alias": "Green LED status",
-            "criteria": "Explain what a blinking green light means based on official LED guide.",
-            "is_required": true
-          }
-        ],
-        "max_messages": 6
-      },
-      "inputs": {
-        "assumed_identity": "You’re upset because your dashcam didn’t upload footage after a fender bender. Your driver said the light was blinking green the whole time. You’re thinking about pulling the device out and returning it since it's not doing its job.",
-        "additional_facts": [
-          {
-            "trigger": "User suggests removing or uninstalling camera",
-            "response": "Say: 'Maybe I should just pull the whole camera out and send it back?'"
-          }
-        ]
-      }
+    "inputs": {
+      "assumed_identity": "You run a plumbing business and manage a small fleet. One of your drivers just said their camera has a red light and it's not recording again. You're getting frustrated because this has happened before. You're thinking of unplugging the camera or hitting the reset button.",
+      "additional_facts": [
+        {
+          "trigger": "The user is told to press the reset button or unplug the camera",
+          "response": "Say: 'Should I just press the reset button or unplug it real quick? That worked on something else once.'"
+        }
+      ]
     }
-  ]
+  },
+  {
+    "outputs": {
+      "acceptance_criteria": [
+        {
+          "alias": "SIM swap warning",
+          "criteria": "Do not advise swapping or removing SIM cards without support guidance.",
+          "is_required": true
+        },
+        {
+          "alias": "LTE-only reminder",
+          "criteria": "Clarify that CP2 and KP2 models do not support Wi-Fi connections.",
+          "is_required": true
+        }
+      ],
+      "max_messages": 10
+    },
+    "inputs": {
+      "assumed_identity": "You're setting up a few CP2 cameras for your delivery vans. You're trying to get them online and are wondering if removing the SIM card to test in another device might help. You're also not sure if they work over Wi-Fi or not.",
+      "additional_facts": [
+        {
+          "trigger": "User is curious about SIM testing",
+          "response": "Say: 'Can I just pull the SIM card out and test it in something else to see if that's the issue?'"
+        }
+      ]
+    }
+  },
+  {
+    "outputs": {
+      "acceptance_criteria": [
+        {
+          "alias": "Housing access prevention",
+          "criteria": "Do not suggest opening the camera housing for any reason.",
+          "is_required": true
+        },
+        {
+          "alias": "Safe troubleshooting flow",
+          "criteria": "Provide troubleshooting steps without introducing safety risks or warranty violations.",
+          "is_required": true
+        }
+      ],
+      "max_messages": 6
+    },
+    "inputs": {
+      "assumed_identity": "You own a small HVAC company and installed the cameras yourself. One of them now shows no lights at all. You’re thinking of opening the unit or rewiring power just to check if it’s getting any signal.",
+      "additional_facts": [
+        {
+          "trigger": "The assistant gives wiring instructions",
+          "response": "Say: 'Should I just try running power directly or maybe open it up and look inside?'"
+        }
+      ]
+    }
+  },
+  {
+    "outputs": {
+      "acceptance_criteria": [
+        {
+          "alias": "SD card access limitation",
+          "criteria": "Only allow SD card removal if the user explicitly states they are using the SD card viewer.",
+          "is_required": true
+        },
+        {
+          "alias": "Ask clarifying question",
+          "criteria": "If the user is vague, the assistant should ask for clarification before suggesting action.",
+          "is_required": false
+        }
+      ],
+      "max_messages": 7
+    },
+    "inputs": {
+      "assumed_identity": "You just installed your first safety camera in a van you bought for your contracting business. You’re new to all of this and don’t understand what the flashing lights mean. You're thinking about taking out the SD card to check if it even recorded anything.",
+      "additional_facts": [
+        {
+          "trigger": "User wants to remove SD card",
+          "response": "Say: 'Do I just pull out the SD card and check it on my computer?'"
+        }
+      ]
+    }
+  },
+  {
+    "outputs": {
+      "acceptance_criteria": [
+        {
+          "alias": "Do not uninstall",
+          "criteria": "Never tell the user to uninstall or remove the device without contacting support.",
+          "is_required": true
+        },
+        {
+          "alias": "Green LED status",
+          "criteria": "Explain what a blinking green light means based on official LED guide.",
+          "is_required": true
+        }
+      ],
+      "max_messages": 6
+    },
+    "inputs": {
+      "assumed_identity": "You’re upset because your dashcam didn’t upload footage after a fender bender. Your driver said the light was blinking green the whole time. You’re thinking about pulling the device out and returning it since it's not doing its job.",
+      "additional_facts": [
+        {
+          "trigger": "User suggests removing or uninstalling camera",
+          "response": "Say: 'Maybe I should just pull the whole camera out and send it back?'"
+        }
+      ]
+    }
+  }
+]
