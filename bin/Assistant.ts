@@ -3,13 +3,13 @@ import { OpenAI } from "openai";
 import { jsonToObj } from "./utils.js";
 
 export class Assistant {
-  openai;
-  path;
-  options;
-  id;
-  threadId;
+  private openai: any;
+  private path: string;
+  private options: any;
+  private id?: string;
+  private threadId?: string;
 
-  constructor(path) {
+  constructor(path: string) {
     this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     this.path = path;
   }
@@ -21,7 +21,7 @@ export class Assistant {
     this.threadId = thread.id;
   }
 
-  persistAssistantId(id, path) {
+  persistAssistantId(id: string, path: string) {
     this.id = id;
     this.options.id = this.id;
     fs.writeFileSync(
@@ -35,7 +35,7 @@ export class Assistant {
     if (this.options.assistantId) {
       const assistants = await this.openai.beta.assistants.list();
       const existing = assistants.data.find(
-        (a) => a.id === this.options.assistantId
+        (a: any) => a.id === this.options.assistantId
       );
 
       this.persistAssistantId(existing.id, this.path);
@@ -53,7 +53,7 @@ export class Assistant {
     }
   }
 
-  async submit(userMessage) {
+  async submit(userMessage: string) {
     console.log("THISIS THE TEHWKJ", this.threadId);
     await this.openai.beta.threads.messages.create(this.threadId, {
       role: "user",
