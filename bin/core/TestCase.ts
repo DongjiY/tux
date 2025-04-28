@@ -1,13 +1,7 @@
+import { Model } from "./Model.js";
 import { Outputs, Inputs, RawTestCase } from "./types";
-import { OpenAI } from "openai";
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error("Missing OPENAI_API_KEY environment variable.");
-}
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-export class TestCase {
+export class TestCase extends Model {
   private outputs: Outputs;
   private inputs: Inputs;
   private history: Array<{ role: string; content: string }> = [];
@@ -15,11 +9,12 @@ export class TestCase {
   private finalResultsPrinted: boolean = false;
 
   private totalMessagesSent: number = 0; // added
-  private totalTokensUsed: number = 0;   // added
+  private totalTokensUsed: number = 0; // added
   private startTime: number = Date.now(); // added
-  private endTime: number = 0;           // added
+  private endTime: number = 0; // added
 
   constructor(raw: RawTestCase) {
+    super();
     this.outputs = this.convertOutputs(raw);
     this.inputs = this.convertInputs(raw);
   }
@@ -57,9 +52,6 @@ export class TestCase {
   public async onResponse(
     messages: Array<{ role: string; content: string }>
   ): Promise<void> {
-    if (this.history.length === 0) {
-      console.log(`Assumed Identity: ${this.inputs.assumedIdentity}`);
-    }
     this.history.push(...messages);
 
     const assistantMessages = this.history.filter(
@@ -79,7 +71,7 @@ export class TestCase {
           ?.has(ac.alias);
         if (alreadyChecked) continue;
 
-        const completion = await openai.chat.completions.create({
+        const completion = await this.openai.chat.completions.create({
           model: "gpt-4-1106-preview",
           temperature: 0,
           messages: [
@@ -103,8 +95,14 @@ export class TestCase {
                 parameters: {
                   type: "object",
                   properties: {
-                    satisfied: { type: "boolean", description: "Whether criteria is satisfied." },
-                    reasoning: { type: "string", description: "Explain why it satisfies or not." },
+                    satisfied: {
+                      type: "boolean",
+                      description: "Whether criteria is satisfied.",
+                    },
+                    reasoning: {
+                      type: "string",
+                      description: "Explain why it satisfies or not.",
+                    },
                   },
                   required: ["satisfied", "reasoning"],
                 },
@@ -120,7 +118,8 @@ export class TestCase {
         this.totalMessagesSent++; // count each OpenAI call
         this.totalTokensUsed += completion.usage?.total_tokens || 0; // count tokens used
 
-        const toolOutput = completion.choices[0]?.message?.tool_calls?.[0]?.function?.arguments;
+        const toolOutput =
+          completion.choices[0]?.message?.tool_calls?.[0]?.function?.arguments;
         if (!toolOutput) continue;
 
         const parsed = JSON.parse(toolOutput) as {
@@ -140,6 +139,13 @@ export class TestCase {
         }
       }
     }
+  }
+
+  public isAllAccepted(): boolean {
+    for (const ac of this.outputs.acceptanceCriteria) {
+      if (!ac.isCompleted) return false;
+    }
+    return true;
   }
 
   public printFinalResults(): void {

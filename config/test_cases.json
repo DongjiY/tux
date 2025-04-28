@@ -4,7 +4,12 @@
       "acceptance_criteria": [
         {
           "alias": "Red LED behavior",
-          "criteria": "Red LED should not be interpreted as recording. It typically indicates SD card failure.",
+          "criteria": "The agent should mention that red LED typically indicates SD card failure.",
+          "is_required": true
+        },
+        {
+          "alias": "Red LED behavior 2",
+          "criteria": "The agent should mention that red LED has nothing to do with the recording status or state.",
           "is_required": true
         },
         {
@@ -13,7 +18,7 @@
           "is_required": true
         }
       ],
-      "max_messages": 8
+      "max_messages": 3
     },
     "inputs": {
       "assumed_identity": "You run a plumbing business and manage a small fleet. One of your drivers just said their camera has a red light and it's not recording again. You're getting frustrated because this has happened before. You're thinking of unplugging the camera or hitting the reset button.",
