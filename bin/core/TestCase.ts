@@ -12,7 +12,12 @@ export class TestCase {
   private inputs: Inputs;
   private history: Array<{ role: string; content: string }> = [];
   private checkedMessages: Map<string, Set<string>> = new Map();
-  private finalResultsPrinted: boolean = false; // ✅ added this line
+  private finalResultsPrinted: boolean = false;
+
+  private totalMessagesSent: number = 0; // added
+  private totalTokensUsed: number = 0;   // added
+  private startTime: number = Date.now(); // added
+  private endTime: number = 0;           // added
 
   constructor(raw: RawTestCase) {
     this.outputs = this.convertOutputs(raw);
@@ -35,7 +40,7 @@ export class TestCase {
           criteria: ac.criteria!,
           isRequired: ac.isRequired!,
           isCompleted: false,
-          failureReasoning: "", // ✅ added this
+          failureReasoning: "", // added
         };
       }),
       maxMessages: raw.outputs.max_messages,
@@ -112,6 +117,9 @@ export class TestCase {
           },
         });
 
+        this.totalMessagesSent++; // count each OpenAI call
+        this.totalTokensUsed += completion.usage?.total_tokens || 0; // count tokens used
+
         const toolOutput = completion.choices[0]?.message?.tool_calls?.[0]?.function?.arguments;
         if (!toolOutput) continue;
 
@@ -128,7 +136,7 @@ export class TestCase {
         if (parsed.satisfied) {
           ac.isCompleted = true;
         } else {
-          ac.failureReasoning = parsed.reasoning; // ✅ Save failure reason
+          ac.failureReasoning = parsed.reasoning;
         }
       }
     }
@@ -136,6 +144,8 @@ export class TestCase {
 
   public printFinalResults(): void {
     if (this.finalResultsPrinted) return;
+
+    this.endTime = Date.now(); // capture test end time
 
     console.log("\nFinal Acceptance Criteria Results:");
     for (const ac of this.outputs.acceptanceCriteria) {
@@ -146,6 +156,13 @@ export class TestCase {
       }
     }
     console.log();
+
+    const totalSeconds = ((this.endTime - this.startTime) / 1000).toFixed(2);
+    console.log("Test Summary:");
+    console.log(`- Total Messages Sent: ${this.totalMessagesSent}`);
+    console.log(`- Total Tokens Used: ${this.totalTokensUsed}`);
+    console.log(`- Total Test Duration: ${totalSeconds} seconds\n`);
+
     this.finalResultsPrinted = true;
   }
 }
