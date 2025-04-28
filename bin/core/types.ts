@@ -13,6 +13,7 @@ export interface AcceptanceCriteria {
   criteria: string;
   isRequired: boolean;
   isCompleted: boolean;
+  failureReasoning: string;
 }
 
 export interface AdditionalFacts {

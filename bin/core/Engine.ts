@@ -52,6 +52,7 @@ export class Engine extends Model {
   }
 
   public async run(): Promise<void> {
+    console.log(`Assumed Identity: ${this.testCase.getInputs().assumedIdentity}`);
     for (let i = 0; i < this.testCase.getOutputs().maxMessages; i++) {
       await this.generateCustomerMessage(); // appends the user message
       const resp = await this.assistantUnderTest.submit(
@@ -64,6 +65,7 @@ export class Engine extends Model {
       await this.testCase.onResponse(this.messages);
     }
     console.log(this.messages);
+    this.testCase.printFinalResults();
   }
 }
 

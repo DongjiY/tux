@@ -67,12 +67,18 @@ export class Assistant extends Model {
     );
 
     if (run.status === "completed") {
-      const messages = await this.openai.beta.threads.messages.list(
-        run.thread_id
-      );
-      console.log(messages);
+      const messages = await this.openai.beta.threads.messages.list(run.thread_id);
+    
+      // Print all messages nicely
+      for (const message of messages.data.reverse()) { // newest at bottom
+        const who = message.role === "assistant" ? "Support" : "Customer";
+        const text = message.content[0]?.text?.value || "(No content)";
+        console.log(`\n[${who}]: ${text}`);
+      }
+    
+      // Return the assistant's last message
       for (const message of messages.data) {
-        if (message.role === "assistant") return message.content[0].text.value;
+        if (message.role === "assistant") return message.content[0]?.text?.value;
       }
     } else {
       return null;
