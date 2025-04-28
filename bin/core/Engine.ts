@@ -52,20 +52,57 @@ export class Engine extends Model {
   }
 
   public async run(): Promise<void> {
-    console.log(`Assumed Identity: ${this.testCase.getInputs().assumedIdentity}`);
+    console.log(
+      `Assumed Identity: ${this.testCase.getInputs().assumedIdentity}`
+    );
+
     for (let i = 0; i < this.testCase.getOutputs().maxMessages; i++) {
+      //   console.log(this.messages);
       await this.generateCustomerMessage(); // appends the user message
+
       const resp = await this.assistantUnderTest.submit(
         this.messages[this.messages.length - 1].content
       );
+
       this.messages.push({
         role: "assistant",
         content: resp,
       });
+
       await this.testCase.onResponse(this.messages);
+      const repetitive = await this.isRepetitive();
+
+      if (repetitive || this.testCase.isAllAccepted()) break;
     }
     console.log(this.messages);
     this.testCase.printFinalResults();
+  }
+
+  private async isRepetitive(): Promise<boolean> {
+    if (this.messages.length > 4) {
+      const len = this.messages.length;
+      const lastAssistantMessage = this.messages[len - 1].content;
+      const twoLastAssistantMessage = this.messages[len - 3].content;
+
+      const completion = await this.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "developer",
+            content:
+              "Your job is to look at two messages and determine if there is sufficient unique content between the two. If the two messages are similar and/or no new information was introduced return SAME, otherwise return DIFF.",
+          },
+          {
+            role: "user",
+            content: `Message 1: ${twoLastAssistantMessage}\nMessage 2: ${lastAssistantMessage}`,
+          },
+        ],
+      });
+
+      return completion.choices[0].message.content === "SAME";
+    }
+
+    return false;
   }
 }
 
