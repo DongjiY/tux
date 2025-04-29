@@ -6,11 +6,22 @@ After cloning the repository, run the following commands in the project root dir
 
 ```sh
 npm install
-npm i -g .
+npm run build
+npm start
 ```
 
-To test the CLI, run the following command:
+This builds the project and starts the frontend viewer at http://localhost:3000.
+
+If the `tux` CLI command is not recognized after building, link it globally:
 
 ```sh
-tux
+npm link
+```
+
+## Running the CLI
+
+To test the CLI:
+
+```sh
+tux -t ./config/test_cases.json -a ./config/assistant.json
 ```
