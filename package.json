@@ -28,6 +28,7 @@
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "express": "^5.1.0",
+    "open": "^10.1.1",
     "openai": "^4.96.0"
   },
   "devDependencies": {
