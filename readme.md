@@ -2,7 +2,7 @@
 
 ## Contribution Guide
 
-After cloning the repository, run:
+After cloning the repository, run the following commands in the project root directory:
 
 ```sh
 npm install
