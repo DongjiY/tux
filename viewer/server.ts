@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs/promises";
+import open from "open"; // <-- ✅ import this
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -22,14 +23,10 @@ app.get("/", (_req, res) => {
 // API endpoint for simulation results
 app.get("/api/results", async (_req, res) => {
   try {
-    // This uses the root of the project (not viewer/) to locate results.json
     const resultsPath = path.resolve(process.cwd(), "results.json");
     const data = await fs.readFile(resultsPath, "utf-8");
     const results = JSON.parse(data);
-
-    // Ensure it always returns an array
     const normalizedResults = Array.isArray(results) ? results : [results];
-
     res.json(normalizedResults);
   } catch (error) {
     console.error("Failed to read results.json:", error);
@@ -37,7 +34,9 @@ app.get("/api/results", async (_req, res) => {
   }
 });
 
-// Start server
+// Start server and auto-open browser
 app.listen(port, () => {
-  console.log(`🖥️  Viewer running at http://localhost:${port}`);
+  const url = `http://localhost:${port}`;
+  console.log(`🖥️  Viewer running at ${url}`);
+  open(url); // <-- ✅ auto-open in default browser
 });
