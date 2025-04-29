@@ -1,10 +1,11 @@
 {
   "name": "tux",
   "version": "1.0.0",
-  "description": "test suite for AI agents",
+  "description": "Test suite for AI agents",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp viewer/public/index.html dist/viewer/public/",
+    "start": "node dist/viewer/server.js",
     "postbuild": "npm link",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,16 +20,18 @@
   },
   "homepage": "https://github.com/DongjiY/tux#readme",
   "bin": {
-    "tux": "./dist/index.js"
+    "tux": "./dist/bin/index.js"
   },
   "type": "module",
   "dependencies": {
     "boxen": "^8.0.1",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
+    "express": "^5.1.0",
     "openai": "^4.96.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.1",
     "@types/node": "^22.15.2",
     "typescript": "^5.8.3"
   }
